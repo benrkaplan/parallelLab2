@@ -144,7 +144,7 @@ void getShortestPath() {
 				break;
 			}
 
-			b = num - 3; 
+			b = cityCount - 3; 
 
 			while(citiesToCalculate[b] <= citiesToCalculate[a-1]) {
 				b--;
