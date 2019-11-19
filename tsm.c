@@ -54,7 +54,7 @@ int main(int argc, char *argv[]){
 	//end creating matrix
 	//populate matrix
 	for( i = 0; i < cityCount; i++ ){
-		for (int j = 0; j < cityCount; j++ ) {
+		for ( j = 0; j < cityCount; j++ ) {
 			fscanf(filePointer, "%d ", &allMatrix[i][j]);
 		}
 	}
