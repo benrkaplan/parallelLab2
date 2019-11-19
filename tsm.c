@@ -162,7 +162,7 @@ void getShortestPath() {
 				citiesToCalculate[a] = citiesToCalculate[b];
 				citiesToCalculate[b] = c;
 				a++;
-				y--;
+				b--;
 			}
 
 		}
