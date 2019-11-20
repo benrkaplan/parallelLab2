@@ -33,6 +33,9 @@ int main(int argc, char *argv[]){
 	if( filePointer ) {
 		cityCount = atoi(argv[2]);
 		threadCount = atoi(argv[1]);
+		if( threadCount >= cityCount ){
+			threadCount = cityCount - 1;
+		}
 	} else {
 		printf("Error, can not open file... exiting...\n" );
 		exit(1);
@@ -171,7 +174,7 @@ void getShortestPath() {
 	} //end parallelism 
 
 	//handling all printing of output
-	printf("Shortest Path: ");
+	printf("Best Path: ");
 	int i;
 	for( i = 0; i < cityCount; i++ ){
 		if( i + 1 != cityCount ){
@@ -180,7 +183,7 @@ void getShortestPath() {
 			printf("%d ", shortestPath[i] );
 		}	
 	}
-	printf("\nShortest distance: %d.\n\n", shortestDistance);
+	printf("\nDistance: %d.\n\n", shortestDistance);
 	//end of function 
 }
 
