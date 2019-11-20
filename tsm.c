@@ -78,8 +78,14 @@ int main(int argc, char *argv[]){
 	//arbitrarily large number to begin with
 	shortestDistance = 999999999;
 
-	//function call to parallel calculation 
-	getShortestPath();
+	if( cityCount == 2 ) {
+		printf("Best Path: 0 -> 1");
+	
+		printf("\nDistance: %d.\n\n", allMatrix[0][1]);
+	} else {
+		//function call to parallel calculation 
+		getShortestPath();
+	}
 
 	return 0;
 }
