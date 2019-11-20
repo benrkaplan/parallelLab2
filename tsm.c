@@ -3,24 +3,23 @@
 #include <omp.h>
 #include <math.h>
 
+//global variables used by all functions and in main
+int ** allMatrix; //matrix of all cities and path weights
+int cityCount; //number of cities
+int pathCount; //total number of paths
+int * shortestPath; //shortest path array
+int shortestDistance; //shortest distance
+int shortestThread; //shortest thread
+int threadCount; //number of threads
+//function specific variables
+int * citiesToCalculate; //cities that the thread must calculate
+int pathsPerThread; //number of paths handled by each thread
+int tidCity; //thread id for each city
 
-
-
-
-int ** allMatrix;
-int cityCount;
-int pathCount;
-int * shortestPath;
-int shortestDistance;
-int shortestThread;
-int threadCount;
-
-int * citiesToCalculate;
-int pathsPerThread;
-int tidCity;
-
+//function 
 void getShortestPath();
 
+//main
 int main(int argc, char *argv[]){
 
 	//begin reading input
@@ -76,20 +75,21 @@ int main(int argc, char *argv[]){
 	//shortest path set 
 	shortestPath = (int *) malloc(cityCount * sizeof(int));
 	//arbitrarily large number to begin with
-	shortestDistance = 999999999;
+	//int max value  - 1
+	shortestDistance = 2147483646;
 
+	//base case 
 	if( cityCount == 2 ) {
 		printf("Best Path: 0 -> 1");
-	
 		printf("\nDistance: %d.\n\n", allMatrix[0][1]);
 	} else {
 		//function call to parallel calculation 
 		getShortestPath();
 	}
-
 	return 0;
 }
 
+//function for calculating shortest path
 void getShortestPath() {
 
 	//begin parallel
@@ -107,15 +107,20 @@ void getShortestPath() {
 				citiesToCalculate[index++] = i;
 			}
 		}
-
+		//start distance
 		int startDistance = allMatrix[0][tidCity];
+		//current distance on this path
 		int thisDistance;
-
+		//each threads work 
 		for( i = 0; i < pathsPerThread; i++ ){
 
 			thisDistance = startDistance;
+			//increment distance 
 			thisDistance += allMatrix[tidCity][citiesToCalculate[0]];
 
+			//continue calculating distance of this path
+			//if at any point it becomes greater than the current shortest
+			//distance break from the loop as that path is obviously not a hit
 			for( i = 1; i < cityCount - 2; i++) {
 				thisDistance += allMatrix[citiesToCalculate[i-1]][citiesToCalculate[i]];
 				if( thisDistance < shortestDistance ) {
@@ -124,18 +129,22 @@ void getShortestPath() {
 					break;
 				}
 			}
-
+			//new shortest distance found
 			if( thisDistance < shortestDistance ) {
-
+				//critical section 
 				#pragma omp critical 
 				{
+					//confirming, for some reason didn't work if I
+					//didn't include the check after doing critical
 					if( thisDistance < shortestDistance ) {
+						//set the shortest distance
 						shortestDistance = thisDistance;
 						shortestPath[0] = 0;
 						shortestPath[1] = tidCity;
 						for (i=0;i<cityCount-2;i++){
               				shortestPath[i+2] = citiesToCalculate[i];
 						}
+						//this is now the shortest thread
 						shortestThread = omp_get_thread_num();
 					}
 				}
@@ -148,7 +157,7 @@ void getShortestPath() {
 			while (a>0 && citiesToCalculate[a-1] >= citiesToCalculate[a]) {
 				a--;
 			}
-
+			//we're done and can break, no more calculations to make
 			if( a == 0 ){
 				break;
 			}
@@ -166,7 +175,6 @@ void getShortestPath() {
 			b = cityCount-3;
 
 			while( a < b ) {
-
 				c = citiesToCalculate[a];
 				citiesToCalculate[a] = citiesToCalculate[b];
 				citiesToCalculate[b] = c;
